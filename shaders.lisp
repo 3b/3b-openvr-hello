@@ -12,7 +12,8 @@
 (input uv-coords-in :vec2 :location 1)
 (input normal-in :vec3 :location 2)
 
-(output uv-coords :vec2)
+(output uv-coords :vec2 :stage :vertex)
+(input uv-coords :vec2 :stage :fragment)
 
 (defun scene-vertex ()
   (setf uv-coords uv-coords-in)
@@ -25,18 +26,17 @@
   (setf output-color (texture my-texture uv-coords)))
 
 
-(input color-in :vec3 :location 1)
-(output color :vec4)
+(input color-in :vec4 :location 1)
 
 (defun controller-transform-vertex ()
-  (setf (.xyz color) color-in
-        (.a color) 1)
+  (setf (.xyz output-color) (.xyz color-in)
+        (.a output-color) 1)
   (setf gl-position (* matrix position)))
 
-(input color :vec4)
+(input color-in :vec4)
 
 (defun controller-transform-fragment ()
-  (setf output-color color))
+  (setf output-color color-in))
 
 
 (uniform diffuse :sampler-2d)
@@ -47,11 +47,25 @@
 (defun render-model-fragment ()
   (setf output-color (texture diffuse uv-coords)))
 
-(output uv :vec2 :qualifiers (:noperspective))
+(output uv :vec2 :stage :vertex ;:qualifiers (:noperspective)
+        )
 
+(input position2 :vec2 :location 0)
 (defun companion-window-vertex ()
   (setf uv uv-coords-in
-        gl-position position))
-(input uv :vec2 :qualifiers (:noperspective))
+        gl-position (vec4 position2 0 1)))
+(input uv :vec2 :stage :fragment; :qualifiers (:noperspective)
+       )
 (defun companion-window-fragment ()
   (setf output-color (texture my-texture uv)))
+
+#++
+(progn
+  (3bgl-shaders:generate-stage :vertex 'scene-vertex)
+  (3bgl-shaders:generate-stage :fragment 'scene-fragment)
+  (3bgl-shaders:generate-stage :vertex 'render-model-vertex)
+  (3bgl-shaders:generate-stage :fragment 'render-model-fragment)
+  (3bgl-shaders:generate-stage :vertex 'companion-window-vertex)
+  (3bgl-shaders:generate-stage :fragment 'companion-window-fragment)
+  (3bgl-shaders:generate-stage :vertex 'controller-transform-vertex)
+  (3bgl-shaders:generate-stage :fragment 'controller-transform-fragment))
