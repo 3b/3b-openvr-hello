@@ -633,16 +633,16 @@
                    for c in xyuv
                    do (setf (aref verts j) (float c 1.0)))))
       ;; left eye verts
-      (v 0 -1 -1 0 1)
-      (v 1 0 -1 1 1)
-      (v 2 -1 1 0 0)
-      (v 3 0 1 1 0)
+      (v 0 -1 -1 0 0)
+      (v 1 0 -1 1 0)
+      (v 2 -1 1 0 1)
+      (v 3 0 1 1 1)
 
       ;; right eye verts
-      (v 4 0 -1 0 1)
-      (v 5 1 -1 1 1)
-      (v 6 0 1 0 0)
-      (v 7 1 1 1 0)
+      (v 4 0 -1 0 0)
+      (v 5 1 -1 1 0)
+      (v 6 0 1 0 1)
+      (v 7 1 1 1 1)
 
       (static-vectors:with-static-vector (indices 12 :element-type
                                                   '(unsigned-byte 16))
